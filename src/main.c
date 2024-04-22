@@ -3,10 +3,13 @@
 #include <stdio.h>
 #include "include/utils.h"
 
+static const u32 LEVEL_OFFSETS[8] = { 0xc95b64, 0x24, 0xa8c, 0x4, 0x2c, 0x50, 0x264, 0x4c };
+
 void tas_info();
 
 int main() {
   printf("\x1b[2J\x1b[H"); // clearing the screen
+  puts("=== LUCIA'S TIQ DEMO TASING TOOLS ===");
   printf("[\x1b[38;5;5mT\x1b[0m] Open TAS tools\n[\x1b[38;5;11mR\x1b[0m] Run TAS\n[\x1b[38;5;9mQ\x1b[0m] Quit\n");
 
   while (1) {
@@ -39,5 +42,25 @@ void tas_info() {
   }
 
   printf("\x1b[1m\x1b[38;5;5m=== MEMORY ===\x1b[0m\n");
-  printf("Base Address: %#x", base_address);
+  printf("Base Address: %#x\n", base_address);
+
+  s8 array_length = length(LEVEL_OFFSETS);
+  s32 level_address = base_address;
+  int scene;
+  SIZE_T bytes_read;
+
+  for (int i = 0; i < array_length; i++) {
+    level_address += LEVEL_OFFSETS[i];
+
+    if (i + 1 == array_length) {
+      ReadProcessMemory(process_handle, (LPVOID)level_address, &scene, sizeof(scene), &bytes_read);
+    } else {
+      ReadProcessMemory(process_handle, (LPVOID)level_address, &level_address, sizeof(scene), &bytes_read);
+    }
+
+    printf("Pointer %#d: %#x [%#x]\n", i + 1, level_address, LEVEL_OFFSETS[i]);
+  }
+
+
+  while (1) {}
 }

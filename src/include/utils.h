@@ -18,8 +18,9 @@
 static const char* check = "[\x1b[92m+\x1b[37m]";
 static const char* minus = "[\x1b[91m-\x1b[37m]";
 
+#define length(array) sizeof(array)/sizeof(array[0])
 #define UNIMPLEMENTED printf("%s Unimplemented!\n", minus)
-#define error(msg, ...) printf(minus); printf(" " msg "\n", ##__VA_ARGS__)
+#define error(msg, ...) fprintf(stderr, minus); fprintf(stderr, " " msg "\n", ##__VA_ARGS__)
 #define okay(msg, ...) printf(check); printf(" " msg "\n", ##__VA_ARGS__)
 
 typedef uint8_t u8;
