@@ -14,10 +14,13 @@
 #include <windows.h>
 #include <tlhelp32.h>
 
-#define UNIMPLEMENTED printf("%s Unimplemented!\n", minus)
 
 static const char* check = "[\x1b[92m+\x1b[37m]";
 static const char* minus = "[\x1b[91m-\x1b[37m]";
+
+#define UNIMPLEMENTED printf("%s Unimplemented!\n", minus)
+#define error(msg, ...) printf(minus); printf(" " msg "\n", ##__VA_ARGS__)
+#define okay(msg, ...) printf(check); printf(" " msg "\n", ##__VA_ARGS__)
 
 typedef uint8_t u8;
 typedef uint16_t u16;

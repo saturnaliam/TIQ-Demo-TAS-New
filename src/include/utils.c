@@ -12,7 +12,7 @@ DWORD get_module_base(const wchar_t* module_name, const DWORD PID) {
   HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, PID);
 
   if (!snapshot) {
-    printf("%s Error while getting the snapshot!\n", minus);
+    error("Error while getting the snapshot!");
     return 0;
   }
 
@@ -20,7 +20,7 @@ DWORD get_module_base(const wchar_t* module_name, const DWORD PID) {
 
   // getting the first module in the process
   if (!Module32First(snapshot, &module_entry)) {
-    printf("%s Error while getting the first module!\n", minus);
+    error("Error while getting the first module!");
     return 0;
   }
 
@@ -32,6 +32,6 @@ DWORD get_module_base(const wchar_t* module_name, const DWORD PID) {
   } while (Module32Next(snapshot, &module_entry));
 
   CloseHandle(snapshot);
-  printf("%s Couldn't find the specified module!\n", minus);
+  error("Couldn't find the specified module!");
   return 0;
 }
