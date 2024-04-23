@@ -37,5 +37,7 @@ typedef double   f64;
 
 DWORD get_module_base(const wchar_t* module_name, const DWORD PID);
 void set_console_cursor_visibility(BOOL show);
+RECT get_window_coordinates(const HWND window_handle);
+POINT get_relative_cursor_position(const HWND window_handle);
 
 #endif // UTILS_H

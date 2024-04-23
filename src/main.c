@@ -87,13 +87,28 @@ void tas_info() {
   }
 
   printf("\n=== GAME DATA ===\n");
+  if (debug == TRUE) message("BEGIN REFRESH SECTION. REFRESHED EVERY %fms", SLEEP_TIME);
   printf("\x1b[s");
+
   while (1) {
     ReadProcessMemory(process_handle, (LPVOID)level_address, &scene, sizeof(scene), &bytes_read);
     reprint("Scene: %d", scene);
+
+    RECT window_coordinates = get_window_coordinates(window_handle);
+    reprint("Window Coordinates: (%d, %d)", window_coordinates.right, window_coordinates.bottom);
     
+    POINT cursor_pos = get_relative_cursor_position(window_handle);
+    reprint("Relative Cursor Position: (%d, %d)", cursor_pos.x, cursor_pos.y);
+
+    if (debug == TRUE) {
+      message("Window right: %d   ", window_coordinates.right);
+      message("Window left: %d   ", window_coordinates.left);
+      message("Window top: %d   ", window_coordinates.top);
+      message("Window bottom: %d   ", window_coordinates.bottom);
+    }
+
     printf("\x1b[u");
-    
+
     Sleep(SLEEP_TIME);
   }
 }

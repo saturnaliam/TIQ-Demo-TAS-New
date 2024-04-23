@@ -49,3 +49,31 @@ void set_console_cursor_visibility(BOOL show) {
   cursor_info.bVisible = show;
   SetConsoleCursorInfo(out, &cursor_info);
 }
+
+/**
+ * @brief windows fuckery to get the coordinates of the window
+ * @param window_handle the windows handle
+ * @return a RECT with the coordinates 
+ */
+RECT get_window_coordinates(const HWND window_handle) {
+  RECT rect;
+  ZeroMemory(&rect, sizeof(rect));
+  GetWindowRect(window_handle, &rect);
+
+  return rect;
+}
+
+/**
+ * @brief windows fuckery to get the relative cursor position
+ * @param window_handle the windows handle
+ * @return a POINT with the coordinates
+ */
+POINT get_relative_cursor_position(const HWND window_handle) {
+  POINT p;
+  ZeroMemory(&p, sizeof(p));
+
+  GetCursorPos(&p);
+  ScreenToClient(window_handle, &p);
+
+  return p;
+}
