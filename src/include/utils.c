@@ -6,7 +6,7 @@
  * @param PID the process id of the process
  * @return the base address of the process
  */
-DWORD get_module_base(const wchar_t* module_name, const DWORD PID) {
+DWORD64 get_module_base(const wchar_t* module_name, const DWORD PID) {
   // this function is basically just black magic
   MODULEENTRY32 module_entry = { 0 };
   HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, PID);
@@ -27,7 +27,7 @@ DWORD get_module_base(const wchar_t* module_name, const DWORD PID) {
   do {
     if (wcscmp(module_entry.szModule, module_name)) {
       CloseHandle(snapshot);
-      return (DWORD)module_entry.modBaseAddr;
+      return (DWORD64)module_entry.modBaseAddr;
     }
   } while (Module32Next(snapshot, &module_entry));
 

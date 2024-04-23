@@ -35,7 +35,7 @@ typedef int32_t  s32;
 typedef int64_t  s64;
 typedef double   f64;
 
-DWORD get_module_base(const wchar_t* module_name, const DWORD PID);
+DWORD64 get_module_base(const wchar_t* module_name, const DWORD PID);
 void set_console_cursor_visibility(BOOL show);
 RECT get_window_coordinates(const HWND window_handle);
 POINT get_relative_cursor_position(const HWND window_handle);

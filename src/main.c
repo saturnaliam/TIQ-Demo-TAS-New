@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
   }
 
   printf("\x1b[2J\x1b[H"); // clearing the screen
-  read_tas_file(L"LICENSE");
+  read_tas_file(L"src\\main.c");
 
  if (debug == TRUE) {
     printf("\x1b[3m\x1b[91mDEBUG MODE ENABLED\x1b[0m\n");
@@ -56,7 +56,7 @@ void tas_info() {
     message("PID: %d", PID);
   }
 
-  DWORD base_address = get_module_base(L"Adobe Flash Player 32", PID);
+  DWORD64 base_address = get_module_base(L"Adobe Flash Player 32", PID);
 
   if (base_address == 0) {
     error("Error while getting base address!");
@@ -70,7 +70,7 @@ void tas_info() {
   printf("Base Address: \x1b[93m%#x\x1b[0m\n", base_address);
 
   s8 array_length = length(LEVEL_OFFSETS);
-  DWORD level_address = base_address;
+  DWORD64 level_address = base_address;
   int scene;
 
   SIZE_T bytes_read; // i do not need to use this, but the function requires it anyways
