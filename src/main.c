@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include "include/utils.h"
+#include "include/tas.h"
 
 static const f64 SLEEP_TIME = 41.6; // how long to sleep between stat refreshes
 static const u32 LEVEL_OFFSETS[8] = { 0xc95b64, 0x24, 0xa8c, 0x4, 0x2c, 0x50, 0x264, 0x4c };
@@ -17,6 +18,7 @@ int main(int argc, char** argv) {
   }
 
   printf("\x1b[2J\x1b[H"); // clearing the screen
+  read_tas_file(L"LICENSE");
 
  if (debug == TRUE) {
     printf("\x1b[3m\x1b[91mDEBUG MODE ENABLED\x1b[0m\n");
@@ -68,7 +70,7 @@ void tas_info() {
   printf("Base Address: \x1b[93m%#x\x1b[0m\n", base_address);
 
   s8 array_length = length(LEVEL_OFFSETS);
-  s32 level_address = base_address;
+  DWORD level_address = base_address;
   int scene;
 
   SIZE_T bytes_read; // i do not need to use this, but the function requires it anyways

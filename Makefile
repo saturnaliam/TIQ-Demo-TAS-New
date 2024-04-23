@@ -1,6 +1,3 @@
-files := src/main.c src/include/utils.c
+files := src/main.c src/include/utils.c src/include/tas.c
 build:
 	gcc -o tas $(files)
-
-run: build
-	./tas.exe
