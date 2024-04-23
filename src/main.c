@@ -24,10 +24,10 @@ int main(int argc, char** argv) {
     printf("\x1b[3m\x1b[91mDEBUG MODE ENABLED\x1b[0m\n");
   }
 
-  puts("=== LUCIA'S TIQ DEMO TASING TOOLS ===");
+  printf("=== LUCIA'S TIQ DEMO TASING TOOLS ===\n");
   printf("[\x1b[38;5;5mT\x1b[0m] Open TAS tools\n[\x1b[38;5;11mR\x1b[0m] Run TAS\n[\x1b[38;5;9mQ\x1b[0m] Quit\n");
 
-  while (1) {
+  while (TRUE) {
     if (GetKeyState('Q') & 0x8000) break;
     if (GetKeyState('T') & 0x8000) tas_info();
     if (GetKeyState('R') & 0x8000) UNIMPLEMENTED;

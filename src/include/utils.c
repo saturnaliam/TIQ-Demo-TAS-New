@@ -1,11 +1,5 @@
 #include "utils.h"
 
-/**
- * @brief returns the base address of a process (technically of the module, but for our use case its the process)
- * @param module_name the name of the process window
- * @param PID the process id of the process
- * @return the base address of the process
- */
 DWORD64 get_module_base(const wchar_t* module_name, const DWORD PID) {
   // this function is basically just black magic
   MODULEENTRY32 module_entry = { 0 };
@@ -36,10 +30,6 @@ DWORD64 get_module_base(const wchar_t* module_name, const DWORD PID) {
   return 0;
 }
 
-/**
- * @brief shows / hides the console cursor
- * @param show whether the cursor should be hidden or shown
- */
 void set_console_cursor_visibility(BOOL show) {
   HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -50,11 +40,6 @@ void set_console_cursor_visibility(BOOL show) {
   SetConsoleCursorInfo(out, &cursor_info);
 }
 
-/**
- * @brief windows fuckery to get the coordinates of the window
- * @param window_handle the windows handle
- * @return a RECT with the coordinates 
- */
 RECT get_window_coordinates(const HWND window_handle) {
   RECT rect;
   ZeroMemory(&rect, sizeof(rect));
@@ -63,11 +48,6 @@ RECT get_window_coordinates(const HWND window_handle) {
   return rect;
 }
 
-/**
- * @brief windows fuckery to get the relative cursor position
- * @param window_handle the windows handle
- * @return a POINT with the coordinates
- */
 POINT get_relative_cursor_position(const HWND window_handle) {
   POINT p;
   ZeroMemory(&p, sizeof(p));
