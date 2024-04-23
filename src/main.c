@@ -64,8 +64,8 @@ void tas_info() {
     message("Base address: %#x", base_address);
   }
 
-  printf("\x1b[1m\x1b[38;5;5m=== MEMORY ===\x1b[0m\n");
-  printf("Base Address: %#x\n", base_address);
+  printf("\x1b[1m\x1b[38;5;139m=== MEMORY ===\x1b[0m\n");
+  printf("Base Address: \x1b[93m%#x\x1b[0m\n", base_address);
 
   s8 array_length = length(LEVEL_OFFSETS);
   s32 level_address = base_address;
@@ -82,23 +82,30 @@ void tas_info() {
       ReadProcessMemory(process_handle, (LPVOID)level_address, &level_address, sizeof(scene), &bytes_read);
     }
 
-    if (debug == TRUE) message("Bytes read: %d", bytes_read);
-    printf("Pointer %#d: %#x [%#x]\n", i + 1, level_address, LEVEL_OFFSETS[i]);
+    if (debug == TRUE) { 
+      message("Bytes read: %d", bytes_read);
+    }
+
+    printf("Pointer %d: \x1b[38;5;140m%#x\x1b[0m [\x1b[38;5;218m%#x\x1b[0m]\n", i + 1, level_address, LEVEL_OFFSETS[i]);
   }
 
   printf("\n=== GAME DATA ===\n");
-  if (debug == TRUE) message("BEGIN REFRESH SECTION. REFRESHED EVERY %fms", SLEEP_TIME);
+
+  if (debug == TRUE) {
+    message("BEGIN REFRESH SECTION. REFRESHED EVERY %fms", SLEEP_TIME);
+  }
+
   printf("\x1b[s");
 
   while (1) {
     ReadProcessMemory(process_handle, (LPVOID)level_address, &scene, sizeof(scene), &bytes_read);
-    reprint("Scene: %d", scene);
+    reprint("Scene: \x1b[38;5;105m%d\x1b[0m", scene);
 
     RECT window_coordinates = get_window_coordinates(window_handle);
-    reprint("Window Coordinates: (%d, %d)", window_coordinates.right, window_coordinates.bottom);
+    reprint("Window Coordinates: \x1b[38;5;175m(%d, %d)\x1b[0m", window_coordinates.right, window_coordinates.bottom);
     
     POINT cursor_pos = get_relative_cursor_position(window_handle);
-    reprint("Relative Cursor Position: (%d, %d)", cursor_pos.x, cursor_pos.y);
+    reprint("Relative Cursor Position: \x1b[38;5;187m(%d, %d)\x1b[0m", cursor_pos.x, cursor_pos.y);
 
     if (debug == TRUE) {
       message("Window right: %d   ", window_coordinates.right);
