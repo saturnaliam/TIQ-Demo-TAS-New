@@ -35,3 +35,17 @@ DWORD get_module_base(const wchar_t* module_name, const DWORD PID) {
   error("Couldn't find the specified module!");
   return 0;
 }
+
+/**
+ * @brief shows / hides the console cursor
+ * @param show whether the cursor should be hidden or shown
+ */
+void set_console_cursor_visibility(BOOL show) {
+  HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
+
+  CONSOLE_CURSOR_INFO cursor_info;
+
+  GetConsoleCursorInfo(out, &cursor_info);
+  cursor_info.bVisible = show;
+  SetConsoleCursorInfo(out, &cursor_info);
+}

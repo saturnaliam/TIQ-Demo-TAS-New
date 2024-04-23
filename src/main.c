@@ -3,12 +3,25 @@
 #include <stdio.h>
 #include "include/utils.h"
 
+static const f64 SLEEP_TIME = 41.6; // how long to sleep between stat refreshes
 static const u32 LEVEL_OFFSETS[8] = { 0xc95b64, 0x24, 0xa8c, 0x4, 0x2c, 0x50, 0x264, 0x4c };
+BOOL debug;
 
 void tas_info();
 
-int main() {
+int main(int argc, char** argv) {
+  if (argc != 2) {
+    debug = FALSE;
+  } else if (strcmp(argv[1], "-d") == 0) {
+    debug = TRUE;
+  }
+
   printf("\x1b[2J\x1b[H"); // clearing the screen
+
+ if (debug == TRUE) {
+    printf("\x1b[3m\x1b[91mDEBUG MODE ENABLED\x1b[0m\n");
+  }
+
   puts("=== LUCIA'S TIQ DEMO TASING TOOLS ===");
   printf("[\x1b[38;5;5mT\x1b[0m] Open TAS tools\n[\x1b[38;5;11mR\x1b[0m] Run TAS\n[\x1b[38;5;9mQ\x1b[0m] Quit\n");
 
@@ -22,8 +35,10 @@ int main() {
 }
 
 void tas_info() {
+  set_console_cursor_visibility(FALSE);
   printf("\x1b[2J\x1b[H"); // clearing the screen
 
+  // getting the pid and other required stuff
   DWORD PID;
   HWND window_handle = FindWindowW(NULL, L"Adobe Flash Player 32");
   GetWindowThreadProcessId(window_handle, &PID);
@@ -32,6 +47,11 @@ void tas_info() {
   if (process_handle == NULL) {
     error("Process handle not found!");
     exit(1);
+  } else if (debug == TRUE) {
+    okay("Process handle found!");
+    message("Process handle: %d", process_handle);
+    message("Window handle: %d", window_handle);
+    message("PID: %d", PID);
   }
 
   DWORD base_address = get_module_base(L"Adobe Flash Player 32", PID);
@@ -39,6 +59,9 @@ void tas_info() {
   if (base_address == 0) {
     error("Error while getting base address!");
     exit(1);
+  } else if (debug == TRUE) {
+    okay("Base address found!");
+    message("Base address: %#x", base_address);
   }
 
   printf("\x1b[1m\x1b[38;5;5m=== MEMORY ===\x1b[0m\n");
@@ -47,7 +70,8 @@ void tas_info() {
   s8 array_length = length(LEVEL_OFFSETS);
   s32 level_address = base_address;
   int scene;
-  SIZE_T bytes_read;
+
+  SIZE_T bytes_read; // i do not need to use this, but the function requires it anyways
 
   for (int i = 0; i < array_length; i++) {
     level_address += LEVEL_OFFSETS[i];
@@ -58,9 +82,18 @@ void tas_info() {
       ReadProcessMemory(process_handle, (LPVOID)level_address, &level_address, sizeof(scene), &bytes_read);
     }
 
+    if (debug == TRUE) message("Bytes read: %d", bytes_read);
     printf("Pointer %#d: %#x [%#x]\n", i + 1, level_address, LEVEL_OFFSETS[i]);
   }
 
-
-  while (1) {}
+  printf("\n=== GAME DATA ===\n");
+  printf("\x1b[s");
+  while (1) {
+    ReadProcessMemory(process_handle, (LPVOID)level_address, &scene, sizeof(scene), &bytes_read);
+    reprint("Scene: %d", scene);
+    
+    printf("\x1b[u");
+    
+    Sleep(SLEEP_TIME);
+  }
 }
