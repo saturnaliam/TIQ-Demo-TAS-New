@@ -25,6 +25,7 @@ TasMove* read_tas_file(const WCHAR* filename) {
       return NULL;
     }
 
+    // ! WHY DOESNT THIS READ THE FIRST CHARACTER OF THE FILE???
     if (ReadFile(file_handle, buffer, (BUFFER_SIZE - 1), &bytes_read, NULL) == FALSE) {
       error("Couldn't read file!");
       CloseHandle(file_handle);
