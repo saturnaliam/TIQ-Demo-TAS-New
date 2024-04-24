@@ -4,6 +4,9 @@
 #include "utils.h"
 #include <stdlib.h>
 
+#define LEFT_CLICK 1
+#define LEFT_RELEASE 2
+
 typedef struct TasMove {
   u8 click_type;
   s32 x, y;
@@ -15,6 +18,6 @@ typedef struct TasMove {
  * @param filename the filename
  * @return an array of the moves
  */
-TasMove* read_tas_file(const WCHAR* filename);
+TasMove* parse_tas_file(const WCHAR* filename);
 
 #endif // TAS_H

@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
   }
 
   printf("\x1b[2J\x1b[H"); // clearing the screen
-  read_tas_file(L"src\\main.c");
+  parse_tas_file(L"example.tas");
 
  if (debug == TRUE) {
     printf("\x1b[3m\x1b[91mDEBUG MODE ENABLED\x1b[0m\n");
