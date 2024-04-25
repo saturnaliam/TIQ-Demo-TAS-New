@@ -10,6 +10,7 @@
 typedef struct TasMove {
   u8 click_type;
   s32 x, y;
+  BOOL end;
 } TasMove;
 
 /**
@@ -19,5 +20,11 @@ typedef struct TasMove {
  * @return an array of the moves
  */
 TasMove* parse_tas_file(const WCHAR* filename);
+
+/**
+ * @brief runs the tas
+ * @param moves the different moves the tas takes
+ */
+void run_tas(TasMove* moves);
 
 #endif // TAS_H

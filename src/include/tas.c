@@ -57,3 +57,43 @@ WCHAR* read_file(const WCHAR* filename) {
 
   return buffer;
 }
+
+void run_tas(TasMove* moves) {
+  const INPUT left_click = { .type = INPUT_MOUSE, .mi.dwFlags = MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE };
+  const INPUT left_release = { .type = INPUT_MOUSE, .mi.dwFlags = MOUSEEVENTF_LEFTUP | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE};
+
+  for (int i = 0; i >= 0; i++) {
+    TasMove move = moves[i];
+    if(move.end == TRUE) { break; }
+    message("click flag: %d", move.click_type & LEFT_CLICK);
+    message("release flag: %d", move.click_type & LEFT_RELEASE);
+
+    INPUT* inputs = NULL;
+    int input_size = 0;
+
+    if ((move.click_type & LEFT_CLICK) > 0) {
+      message("left click");
+      inputs = realloc(inputs, input_size++);
+
+      inputs[input_size - 1] = left_click;
+      inputs[input_size - 1].mi.dx = move.x;
+      inputs[input_size - 1].mi.dy = move.y;
+    }
+
+    if ((move.click_type & LEFT_RELEASE) > 0) {
+      message("left release");
+      inputs = realloc(inputs, input_size++);
+
+      inputs[input_size - 1] = left_release;
+      inputs[input_size - 1].mi.dx = move.x;
+      inputs[input_size - 1].mi.dy = move.y;
+    }
+
+    message("input size: %d", input_size);
+    if (SendInput(input_size, inputs, sizeof(INPUT)) != input_size) {
+      error("didnt send all inputs :( %x", GetLastError());
+    }
+
+    free(inputs);
+  }
+}

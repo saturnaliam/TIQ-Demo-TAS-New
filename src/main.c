@@ -18,7 +18,12 @@ int main(int argc, char** argv) {
   }
 
   printf("\x1b[2J\x1b[H"); // clearing the screen
-  parse_tas_file(L"example.tas");
+  TasMove moves[2];
+  TasMove move = { .click_type = LEFT_CLICK | LEFT_RELEASE, .x = 30000, .y = 30000, .end = FALSE };
+  TasMove move2 = { .click_type = LEFT_CLICK | LEFT_RELEASE, .x = 50, .y = 5, .end = TRUE };
+  moves[0] = move;
+  moves[1] = move2;
+  run_tas(moves);
 
  if (debug == TRUE) {
     printf("\x1b[3m\x1b[91mDEBUG MODE ENABLED\x1b[0m\n");
