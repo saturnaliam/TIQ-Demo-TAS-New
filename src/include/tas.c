@@ -73,29 +73,24 @@ void run_tas(Tas tas) {
     TasMove move = tas.moves[i];
 
     int inputs_length = 0;
-    INPUT* inputs = malloc(sizeof(INPUT));
+    INPUT inputs[2];
 
     if ((move.click_type & LEFT_CLICK) > 0) {
-      inputs = realloc(inputs, sizeof(INPUT) * (inputs_length + 1));
+      inputs[inputs_length] = left_click;
+      inputs[inputs_length].mi.dx = move.x;
+      inputs[inputs_length].mi.dy = move.y;
       inputs_length += 1;
-      inputs[inputs_length - 1] = left_click;
-      inputs[inputs_length - 1].mi.dx = move.x;
-      inputs[inputs_length - 1].mi.dy = move.y;
     }
 
     if ((move.click_type & LEFT_RELEASE) > 0) {
-      inputs = realloc(inputs, sizeof(INPUT) * (inputs_length + 1));
-      inputs_length += 1;
-      inputs[inputs_length - 1] = left_release;
-      inputs[inputs_length - 1].mi.dx = move.x;
-      inputs[inputs_length - 1].mi.dy = move.y;
+      inputs[inputs_length] = left_release;
+      inputs[inputs_length].mi.dx = move.x;
+      inputs[inputs_length].mi.dy = move.y;
     }
 
 
     if (SendInput(inputs_length, inputs, sizeof(INPUT)) != inputs_length) {
       error("error while input send :(");
     }
-
-    free(inputs);
   }
 }
