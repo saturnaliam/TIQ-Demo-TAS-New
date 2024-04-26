@@ -86,6 +86,7 @@ void run_tas(Tas tas) {
       inputs[inputs_length] = left_release;
       inputs[inputs_length].mi.dx = move.x;
       inputs[inputs_length].mi.dy = move.y;
+      inputs_length += 1;
     }
 
 
