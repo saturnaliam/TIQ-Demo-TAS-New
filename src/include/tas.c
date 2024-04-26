@@ -4,6 +4,14 @@
 #define BUFFER_SIZE 10240 // this is kinda arbitrary but i cant imagine a world where youd need more than 10kb of tas data ¯\_(ツ)_/¯
                         // just adding on for the person who will inevitably say "erm actually" each line needs ~12 bytes, so 10kb is nearly 900 moves in a game with like 30 questions
 
+// teehee
+#define CLICK_TYPE(click_input) \
+  inputs = realloc(inputs, sizeof(INPUT) * (inputs_length + 1)); \
+  inputs_length += 1; \
+  inputs[inputs_length] = click_input; \
+  inputs[inputs_length].mi.dx = move.x; \
+  inputs[inputs_length].mi.dy = move.y; \
+
 /**
  * @brief dealing with reading the file and getting its data
  * @param filename the filename
@@ -11,14 +19,13 @@
  */
 WCHAR* read_file(const WCHAR* filename);
 
-TasMove* parse_tas_file(const WCHAR* filename) {
+Tas parse_tas_file(const WCHAR* filename) {
   WCHAR* file_contents = read_file(filename);
 
   TasMove* movements;
   
 
   free(file_contents);
-  return NULL;
 }
 
 WCHAR* read_file(const WCHAR* filename) {
@@ -58,40 +65,35 @@ WCHAR* read_file(const WCHAR* filename) {
   return buffer;
 }
 
-void run_tas(TasMove* moves) {
+void run_tas(Tas tas) {
   const INPUT left_click = { .type = INPUT_MOUSE, .mi.dwFlags = MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE };
   const INPUT left_release = { .type = INPUT_MOUSE, .mi.dwFlags = MOUSEEVENTF_LEFTUP | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE};
 
-  for (int i = 0; i >= 0; i++) {
-    TasMove move = moves[i];
-    if(move.end == TRUE) { break; }
-    message("click flag: %d", move.click_type & LEFT_CLICK);
-    message("release flag: %d", move.click_type & LEFT_RELEASE);
+  for (int i = 0; i < tas.moves_length; i++) {
+    TasMove move = tas.moves[i];
 
-    INPUT* inputs = NULL;
-    int input_size = 0;
+    int inputs_length = 0;
+    INPUT* inputs = malloc(sizeof(INPUT));
 
     if ((move.click_type & LEFT_CLICK) > 0) {
-      message("left click");
-      inputs = realloc(inputs, input_size++);
-
-      inputs[input_size - 1] = left_click;
-      inputs[input_size - 1].mi.dx = move.x;
-      inputs[input_size - 1].mi.dy = move.y;
+      inputs = realloc(inputs, sizeof(INPUT) * (inputs_length + 1));
+      inputs_length += 1;
+      inputs[inputs_length - 1] = left_click;
+      inputs[inputs_length - 1].mi.dx = move.x;
+      inputs[inputs_length - 1].mi.dy = move.y;
     }
 
     if ((move.click_type & LEFT_RELEASE) > 0) {
-      message("left release");
-      inputs = realloc(inputs, input_size++);
-
-      inputs[input_size - 1] = left_release;
-      inputs[input_size - 1].mi.dx = move.x;
-      inputs[input_size - 1].mi.dy = move.y;
+      inputs = realloc(inputs, sizeof(INPUT) * (inputs_length + 1));
+      inputs_length += 1;
+      inputs[inputs_length - 1] = left_release;
+      inputs[inputs_length - 1].mi.dx = move.x;
+      inputs[inputs_length - 1].mi.dy = move.y;
     }
 
-    message("input size: %d", input_size);
-    if (SendInput(input_size, inputs, sizeof(INPUT)) != input_size) {
-      error("didnt send all inputs :( %x", GetLastError());
+
+    if (SendInput(inputs_length, inputs, sizeof(INPUT)) != inputs_length) {
+      error("error while input send :(");
     }
 
     free(inputs);

@@ -10,8 +10,12 @@
 typedef struct TasMove {
   u8 click_type;
   s32 x, y;
-  BOOL end;
 } TasMove;
+
+typedef struct Tas {
+  TasMove* moves;
+  u32 moves_length;
+} Tas;
 
 /**
  * @note the caller takes control of the memory and should free it
@@ -19,12 +23,12 @@ typedef struct TasMove {
  * @param filename the filename
  * @return an array of the moves
  */
-TasMove* parse_tas_file(const WCHAR* filename);
+Tas parse_tas_file(const WCHAR* filename);
 
 /**
  * @brief runs the tas
- * @param moves the different moves the tas takes
+ * @param tas the full tas
  */
-void run_tas(TasMove* moves);
+void run_tas(Tas tas);
 
 #endif // TAS_H
