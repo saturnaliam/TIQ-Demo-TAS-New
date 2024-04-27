@@ -25,21 +25,31 @@ void start_tas(const char* filename) {
   int moves_length = 0;
   int move_field = MOVE_X;
 
+  HWND window_handle = FindWindowW(NULL, L"Adobe Flash Player 32");
+  POINT cursor; // neede for fuckery
+
+  if (window_handle == NULL) {
+    error("Failed getting window handle! (code %d)", GetLastError());
+  }
+
   for (int i = 0; i < BUFFER_SIZE; i++) {
     // if we get a whitespace, push the last field into the move
     if ((isspace(file_contents[i]) != 0 || file_contents[i] == '\0') && buffer_index != 0) {
       switch (move_field) {
         case MOVE_X: {
-          current_move.x = atoi(buffer);
+          cursor.x = atoi(buffer);
           break;
         }
 
         case MOVE_Y: {
-          current_move.y = atoi(buffer);
+          cursor.y = atoi(buffer);
           break;
         }
         
         case MOVE_CLICK: {
+          ClientToScreen(window_handle, &cursor);
+          current_move.x = cursor.x;
+          current_move.y = cursor.y;
           current_move.click_type = atoi(buffer);
 
           movements = realloc(movements, sizeof(TasMove) * ++moves_length);
@@ -114,7 +124,6 @@ void run_tas(Tas tas) {
   const INPUT left_click = { .type = INPUT_MOUSE, .mi.dwFlags = MOUSEEVENTF_LEFTDOWN };
   const INPUT left_release = { .type = INPUT_MOUSE, .mi.dwFlags = MOUSEEVENTF_LEFTUP };
 
-  message("moves length: %d", tas.moves_length);
   for (int i = 0; i < tas.moves_length; i++) {
     TasMove move = tas.moves[i];
 
@@ -135,8 +144,8 @@ void run_tas(Tas tas) {
       error("Could not move mouse (code %d)", GetLastError());
     }
 
-    // if (SendInput(inputs_length, inputs, sizeof(INPUT)) != inputs_length) {
-    //   error("Could not send input (code %d)", GetLastError());
-    // }
+    if (SendInput(inputs_length, inputs, sizeof(INPUT)) != inputs_length) {
+      error("Could not send input (code %d)", GetLastError());
+    }
   }
 }
