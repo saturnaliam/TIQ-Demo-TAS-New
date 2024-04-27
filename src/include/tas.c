@@ -1,30 +1,88 @@
 #include "tas.h"
-#include <strsafe.h>
 
 #define BUFFER_SIZE 10240 // this is kinda arbitrary but i cant imagine a world where youd need more than 10kb of tas data ¯\_(ツ)_/¯
                         // just adding on for the person who will inevitably say "erm actually" each line needs ~12 bytes, so 10kb is nearly 900 moves in a game with like 30 questions
+
+#define MOVE_X 0 // used to keep track of the last field in the move thing filled
+#define MOVE_Y 1
+#define MOVE_CLICK 2
 
 /**
  * @brief dealing with reading the file and getting its data
  * @param filename the filename
  * @return the contents of the file
  */
-WCHAR* read_file(const WCHAR* filename);
+char* read_file(const char* filename);
 
-Tas parse_tas_file(const WCHAR* filename) {
-  WCHAR* file_contents = read_file(filename);
+void start_tas(const char* filename) {
+  char* file_contents = read_file(filename);
 
-  TasMove* movements;
-  
+  TasMove* movements = NULL;
 
+  TasMove current_move;
+  char buffer[4]; // only a length of 4 bc idk any monitors with a 5 digit number of pixels
+  int buffer_index = 0;
+  int moves_length = 0;
+  int move_field = MOVE_X;
+
+  for (int i = 0; i < BUFFER_SIZE; i++) {
+    // if we get a whitespace, push the last field into the move
+    if ((isspace(file_contents[i]) != 0 || file_contents[i] == '\0') && buffer_index != 0) {
+      switch (move_field) {
+        case MOVE_X: {
+          current_move.x = atoi(buffer);
+          message("move x set: %d", current_move.x);
+          break;
+        }
+
+        case MOVE_Y: {
+          current_move.y = atoi(buffer);
+          message("move y set: %d", current_move.y);
+          break;
+        }
+        
+        case MOVE_CLICK: {
+          current_move.click_type = atoi(buffer);
+          message("move click set: %d", current_move.click_type);
+
+          movements = realloc(movements, sizeof(TasMove) * ++moves_length);
+          break;
+        }
+      }
+
+      move_field++;
+      move_field %= MOVE_CLICK;
+
+      ZeroMemory(buffer, sizeof(WCHAR) * 4);
+      buffer_index = 0;
+
+      if (file_contents[i] == '\0') break;
+    } else {
+      if (buffer_index >= 4) {
+        error("More characters than allowed given! Maximum length for a field is 4!");
+        printf("buffer: %s\nbuffer length: %d\n", buffer, buffer_index);
+        return;
+      }
+
+      buffer[buffer_index++] = file_contents[i];
+    }
+  }
+
+  Tas full_tas = { .moves = movements, .moves_length = moves_length };
+  message("tas length: %d", moves_length);
+
+  run_tas(full_tas);
+
+  message("tas ran");
   free(file_contents);
+  free(movements);
 }
 
-WCHAR* read_file(const WCHAR* filename) {
+char* read_file(const char* filename) {
   DWORD bytes_read;
-  WCHAR* buffer = malloc(BUFFER_SIZE + 1);
+  char* buffer = malloc(BUFFER_SIZE + 1);
 
-  HANDLE file_handle = CreateFileW(filename,
+  HANDLE file_handle = CreateFileA(filename,
                                   GENERIC_READ,
                                   FILE_SHARE_READ,
                                   NULL,
@@ -61,8 +119,12 @@ void run_tas(Tas tas) {
   const INPUT left_click = { .type = INPUT_MOUSE, .mi.dwFlags = MOUSEEVENTF_LEFTDOWN };
   const INPUT left_release = { .type = INPUT_MOUSE, .mi.dwFlags = MOUSEEVENTF_LEFTUP };
 
+  message("moves length: %d", tas.moves_length);
   for (int i = 0; i < tas.moves_length; i++) {
     TasMove move = tas.moves[i];
+    message("move x: %d", move.x);
+    message("move y: %d", move.y);
+    message("move click type: %d", move.click_type);
 
     int inputs_length = 0;
     INPUT inputs[2];

@@ -3,6 +3,7 @@
 
 #include "utils.h"
 #include <stdlib.h>
+#include <stddef.h>
 
 #define LEFT_CLICK 1
 #define LEFT_RELEASE 2
@@ -18,12 +19,10 @@ typedef struct Tas {
 } Tas;
 
 /**
- * @note the caller takes control of the memory and should free it
- * @brief reads a tas file and returns an array of the moves
+ * @brief starts and runs the tas
  * @param filename the filename
- * @return an array of the moves
  */
-Tas parse_tas_file(const WCHAR* filename);
+void start_tas(const char* filename);
 
 /**
  * @brief runs the tas
