@@ -66,8 +66,8 @@ WCHAR* read_file(const WCHAR* filename) {
 }
 
 void run_tas(Tas tas) {
-  const INPUT left_click = { .type = INPUT_MOUSE, .mi.dwFlags = MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE };
-  const INPUT left_release = { .type = INPUT_MOUSE, .mi.dwFlags = MOUSEEVENTF_LEFTUP | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE};
+  const INPUT left_click = { .type = INPUT_MOUSE, .mi.dwFlags = MOUSEEVENTF_LEFTDOWN };
+  const INPUT left_release = { .type = INPUT_MOUSE, .mi.dwFlags = MOUSEEVENTF_LEFTUP };
 
   for (int i = 0; i < tas.moves_length; i++) {
     TasMove move = tas.moves[i];
@@ -77,18 +77,17 @@ void run_tas(Tas tas) {
 
     if ((move.click_type & LEFT_CLICK) > 0) {
       inputs[inputs_length] = left_click;
-      inputs[inputs_length].mi.dx = move.x;
-      inputs[inputs_length].mi.dy = move.y;
       inputs_length += 1;
     }
 
     if ((move.click_type & LEFT_RELEASE) > 0) {
       inputs[inputs_length] = left_release;
-      inputs[inputs_length].mi.dx = move.x;
-      inputs[inputs_length].mi.dy = move.y;
       inputs_length += 1;
     }
 
+    if (SetCursorPos(move.x, move.y) == FALSE) {
+      error("error while setting cursors position :(");
+    }
 
     if (SendInput(inputs_length, inputs, sizeof(INPUT)) != inputs_length) {
       error("error while input send :(");
