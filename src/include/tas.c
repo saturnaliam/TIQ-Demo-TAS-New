@@ -1,4 +1,6 @@
 #include "tas.h"
+#include <unistd.h>
+#include <time.h>
 
 #define BUFFER_SIZE 10240 // this is kinda arbitrary but i cant imagine a world where youd need more than 10kb of tas data ¯\_(ツ)_/¯
                         // just adding on for the person who will inevitably say "erm actually" each line needs ~12 bytes, so 10kb is nearly 900 moves in a game with like 30 questions
@@ -15,6 +17,7 @@
 char* read_file(const char* filename);
 
 void start_tas(const char* filename) {
+  message("reading file!");
   char* file_contents = read_file(filename);
 
   TasMove* movements = NULL;
@@ -47,7 +50,11 @@ void start_tas(const char* filename) {
         }
         
         case MOVE_CLICK: {
-          ClientToScreen(window_handle, &cursor);
+          if (ClientToScreen(window_handle, &cursor) == FALSE) {
+            error("error while getting client pos");
+            exit(1);
+          }
+
           current_move.x = cursor.x;
           current_move.y = cursor.y;
           current_move.click_type = atoi(buffer);
@@ -61,11 +68,12 @@ void start_tas(const char* filename) {
       move_field++;
       move_field %= MOVE_CLICK + 1;
 
-      ZeroMemory(buffer, sizeof(WCHAR) * 4);
+      SecureZeroMemory(buffer, sizeof(WCHAR) * 4);
       buffer_index = 0;
 
       if (file_contents[i] == '\0') break;
     } else {
+
       if (buffer_index >= 4) {
         error("More characters than allowed given! Maximum length for a field is 4!");
         return;
@@ -73,6 +81,7 @@ void start_tas(const char* filename) {
 
       buffer[buffer_index++] = file_contents[i];
     }
+
   }
 
   Tas full_tas = { .moves = movements, .moves_length = moves_length };
@@ -124,11 +133,13 @@ void run_tas(Tas tas) {
   const INPUT left_click = { .type = INPUT_MOUSE, .mi.dwFlags = MOUSEEVENTF_LEFTDOWN };
   const INPUT left_release = { .type = INPUT_MOUSE, .mi.dwFlags = MOUSEEVENTF_LEFTUP };
 
+  clock_t initial = clock();
   for (int i = 0; i < tas.moves_length; i++) {
+
     TasMove move = tas.moves[i];
 
     int inputs_length = 0;
-    INPUT inputs[2];
+    INPUT inputs[2] = {};
 
     if ((move.click_type & LEFT_CLICK) > 0) {
       inputs[inputs_length] = left_click;
@@ -147,5 +158,12 @@ void run_tas(Tas tas) {
     if (SendInput(inputs_length, inputs, sizeof(INPUT)) != inputs_length) {
       error("Could not send input (code %d)", GetLastError());
     }
+
+    if (SendInput(inputs_length, inputs, sizeof(INPUT)) != inputs_length) {
+      error("Could not send input (code %d)", GetLastError());
+    }
   }
+
+  clock_t final = clock();
+  message("time: %dms", final - initial);
 }

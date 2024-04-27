@@ -19,7 +19,8 @@ int main(int argc, char** argv) {
 
   printf("\x1b[2J\x1b[H"); // clearing the screen
 
-  start_tas("example.tas");
+  //start_tas("example.tas");
+  //exit(1);
 
   if (debug == TRUE) {
     printf("\x1b[3m\x1b[91mDEBUG MODE ENABLED\x1b[0m\n");

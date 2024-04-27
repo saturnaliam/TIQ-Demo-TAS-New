@@ -42,7 +42,7 @@ void set_console_cursor_visibility(BOOL show) {
 
 RECT get_window_coordinates(const HWND window_handle) {
   RECT rect;
-  ZeroMemory(&rect, sizeof(rect));
+  SecureZeroMemory(&rect, sizeof(rect));
   GetWindowRect(window_handle, &rect);
 
   return rect;
@@ -50,7 +50,7 @@ RECT get_window_coordinates(const HWND window_handle) {
 
 POINT get_relative_cursor_position(const HWND window_handle) {
   POINT p;
-  ZeroMemory(&p, sizeof(p));
+  SecureZeroMemory(&p, sizeof(p));
 
   GetCursorPos(&p);
   ScreenToClient(window_handle, &p);
