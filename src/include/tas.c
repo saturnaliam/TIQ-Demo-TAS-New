@@ -4,14 +4,6 @@
 #define BUFFER_SIZE 10240 // this is kinda arbitrary but i cant imagine a world where youd need more than 10kb of tas data ¯\_(ツ)_/¯
                         // just adding on for the person who will inevitably say "erm actually" each line needs ~12 bytes, so 10kb is nearly 900 moves in a game with like 30 questions
 
-// teehee
-#define CLICK_TYPE(click_input) \
-  inputs = realloc(inputs, sizeof(INPUT) * (inputs_length + 1)); \
-  inputs_length += 1; \
-  inputs[inputs_length] = click_input; \
-  inputs[inputs_length].mi.dx = move.x; \
-  inputs[inputs_length].mi.dy = move.y; \
-
 /**
  * @brief dealing with reading the file and getting its data
  * @param filename the filename
@@ -86,11 +78,11 @@ void run_tas(Tas tas) {
     }
 
     if (SetCursorPos(move.x, move.y) == FALSE) {
-      error("error while setting cursors position :(");
+      error("Could not move mouse (code %d)", GetLastError());
     }
 
     if (SendInput(inputs_length, inputs, sizeof(INPUT)) != inputs_length) {
-      error("error while input send :(");
+      error("Could not send input (code %d)", GetLastError());
     }
   }
 }
