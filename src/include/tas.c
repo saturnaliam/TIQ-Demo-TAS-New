@@ -105,7 +105,7 @@ char* read_file(const char* filename) {
                                   NULL);
 
   if (file_handle == INVALID_HANDLE_VALUE) {
-    error("Invalid file handle!");
+    error("Invalid file handle! (code %d)", GetLastError());
     return NULL;
   }
 

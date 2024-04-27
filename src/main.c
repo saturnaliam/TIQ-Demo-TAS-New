@@ -9,6 +9,7 @@ static const u32 LEVEL_OFFSETS[8] = { 0xc95b64, 0x24, 0xa8c, 0x4, 0x2c, 0x50, 0x
 BOOL debug;
 
 void tas_info();
+void begin_tas();
 
 int main(int argc, char** argv) {
   if (argc != 2) {
@@ -18,9 +19,6 @@ int main(int argc, char** argv) {
   }
 
   printf("\x1b[2J\x1b[H"); // clearing the screen
-
-  //start_tas("example.tas");
-  //exit(1);
 
   if (debug == TRUE) {
     printf("\x1b[3m\x1b[91mDEBUG MODE ENABLED\x1b[0m\n");
@@ -32,10 +30,25 @@ int main(int argc, char** argv) {
   while (TRUE) {
     if (GetKeyState('Q') & 0x8000) break;
     if (GetKeyState('T') & 0x8000) tas_info();
-    if (GetKeyState('R') & 0x8000) UNIMPLEMENTED;
+    if (GetKeyState('R') & 0x8000) begin_tas();
   }
 
   return 0;
+}
+
+void begin_tas() {
+  printf("\x1b[2J\x1b[H"); // clearing the screen
+  char file_path[MAX_PATH];
+  printf("name of tas file: ");
+  fgets(file_path, MAX_PATH, stdin);
+  file_path[strcspn(file_path, "\r\n")] = 0;
+
+  start_tas(file_path);
+
+  printf("press [\x1b[38;5;9mQ\x1b[0m] to quit\n");
+  while (TRUE) {
+    if (GetKeyState('Q') & 0x8000) exit(0);
+  }
 }
 
 void tas_info() {
