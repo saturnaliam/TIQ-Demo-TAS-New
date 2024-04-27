@@ -31,27 +31,25 @@ void start_tas(const char* filename) {
       switch (move_field) {
         case MOVE_X: {
           current_move.x = atoi(buffer);
-          message("move x set: %d", current_move.x);
           break;
         }
 
         case MOVE_Y: {
           current_move.y = atoi(buffer);
-          message("move y set: %d", current_move.y);
           break;
         }
         
         case MOVE_CLICK: {
           current_move.click_type = atoi(buffer);
-          message("move click set: %d", current_move.click_type);
 
           movements = realloc(movements, sizeof(TasMove) * ++moves_length);
+          movements[moves_length - 1] = current_move;
           break;
         }
       }
 
       move_field++;
-      move_field %= MOVE_CLICK;
+      move_field %= MOVE_CLICK + 1;
 
       ZeroMemory(buffer, sizeof(WCHAR) * 4);
       buffer_index = 0;
@@ -60,7 +58,6 @@ void start_tas(const char* filename) {
     } else {
       if (buffer_index >= 4) {
         error("More characters than allowed given! Maximum length for a field is 4!");
-        printf("buffer: %s\nbuffer length: %d\n", buffer, buffer_index);
         return;
       }
 
@@ -69,11 +66,9 @@ void start_tas(const char* filename) {
   }
 
   Tas full_tas = { .moves = movements, .moves_length = moves_length };
-  message("tas length: %d", moves_length);
 
   run_tas(full_tas);
 
-  message("tas ran");
   free(file_contents);
   free(movements);
 }
@@ -122,9 +117,6 @@ void run_tas(Tas tas) {
   message("moves length: %d", tas.moves_length);
   for (int i = 0; i < tas.moves_length; i++) {
     TasMove move = tas.moves[i];
-    message("move x: %d", move.x);
-    message("move y: %d", move.y);
-    message("move click type: %d", move.click_type);
 
     int inputs_length = 0;
     INPUT inputs[2];
@@ -143,8 +135,8 @@ void run_tas(Tas tas) {
       error("Could not move mouse (code %d)", GetLastError());
     }
 
-    if (SendInput(inputs_length, inputs, sizeof(INPUT)) != inputs_length) {
-      error("Could not send input (code %d)", GetLastError());
-    }
+    // if (SendInput(inputs_length, inputs, sizeof(INPUT)) != inputs_length) {
+    //   error("Could not send input (code %d)", GetLastError());
+    // }
   }
 }
